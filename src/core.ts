@@ -10,3 +10,23 @@ export const createDigitValidator = (base: number) => {
   return (char: string): boolean =>
     char.length === 1 && allowedDigits.includes(char.toLowerCase());
 };
+
+export const isValidGuess = (guess: string, length: number, base: number): boolean => {
+  if (
+    !Number.isInteger(length) ||
+    length < 1 ||
+    length > base ||
+    guess.length !== length ||
+    !Number.isInteger(base) ||
+    base < 2 ||
+    base > DIGITS.length
+  ) {
+    return false;
+  }
+
+  const isDigitValid = createDigitValidator(base);
+  const digits = [...guess];
+  const normalizedDigits = digits.map((digit) => digit.toLowerCase());
+
+  return digits.every(isDigitValid) && new Set(normalizedDigits).size === length;
+};
