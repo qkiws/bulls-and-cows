@@ -30,3 +30,17 @@ export const isValidGuess = (guess: string, length: number, base: number): boole
 
   return digits.every(isDigitValid) && new Set(normalizedDigits).size === length;
 };
+
+export type GuessResult = Readonly<{ bulls: number; cows: number }>;
+
+export const evaluateGuess = (secret: string, guess: string): GuessResult => {
+  const secretDigits = [...secret.toLowerCase()];
+  const guessDigits = [...guess.toLowerCase()];
+  const bulls = secretDigits.reduce(
+    (count, digit, index) => count + Number(digit === guessDigits[index]),
+    0,
+  );
+  const matchingDigits = secretDigits.filter((digit) => guessDigits.includes(digit)).length;
+
+  return { bulls, cows: matchingDigits - bulls };
+};
