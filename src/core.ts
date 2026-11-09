@@ -1,5 +1,44 @@
 const DIGITS = '0123456789abcdef';
 
+export const generateSecret = (
+  length: number,
+  base: number,
+  random: () => number = Math.random,
+): string => {
+  if (
+    !Number.isInteger(length) ||
+    length < 1 ||
+    !Number.isInteger(base) ||
+    base < 2 ||
+    base > DIGITS.length ||
+    length > base
+  ) {
+    throw new RangeError('Length must be positive and no greater than a base from 2 to 16.');
+  }
+
+  const digits = DIGITS.slice(0, base).split('');
+  const selected: string[] = [];
+
+  for (let index = 0; index < length; index += 1) {
+    const value = random();
+    if (!Number.isFinite(value) || value < 0 || value >= 1) {
+      throw new RangeError('Random source must return a number from 0 (inclusive) to 1.');
+    }
+
+    const swapIndex = index + Math.floor(value * (base - index));
+    const digit = digits[swapIndex];
+    if (digit === undefined) {
+      throw new RangeError('Random source selected an unavailable digit.');
+    }
+
+    digits[swapIndex] = digits[index]!;
+    digits[index] = digit;
+    selected.push(digit);
+  }
+
+  return selected.join('');
+};
+
 export const createDigitValidator = (base: number) => {
   if (!Number.isInteger(base) || base < 2 || base > DIGITS.length) {
     throw new RangeError('Base must be an integer from 2 to 16.');
