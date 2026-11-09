@@ -83,3 +83,28 @@ export const evaluateGuess = (secret: string, guess: string): GuessResult => {
 
   return { bulls, cows: matchingDigits - bulls };
 };
+
+const possibleSecretCounts = new Map<string, number>();
+
+export const countPossibleSecrets = (length: number, base: number): number => {
+  if (
+    !Number.isInteger(length) ||
+    !Number.isInteger(base) ||
+    length < 0 ||
+    base < 0 ||
+    length > base
+  ) {
+    return 0;
+  }
+
+  const cacheKey = `${length}:${base}`;
+  const cachedCount = possibleSecretCounts.get(cacheKey);
+  if (cachedCount !== undefined) {
+    return cachedCount;
+  }
+
+  const count = length === 0 ? 1 : base * countPossibleSecrets(length - 1, base - 1);
+  possibleSecretCounts.set(cacheKey, count);
+
+  return count;
+};
